@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title class="elapsed"></title>
+</head>
+<body>
+<p>入室時間: 
+  <input type="datetime-local" id="start">
+  <button id="setTimeButton">セット</button>
+</p>
+
+<p style="font-size: 24px; font-weight: bold;">
+  経過時間：<span class="elapsed"></span>
+</p>
+
+<!-- 自遊空間「巣鴨店」の料金表 -->
+<img src="https://jiqoo.jp/img/price/1355.jpg" width="800">
+
+<script>
+/*----------------------
+      functions
+-----------------------*/
+// 入室時間のタイムスタンプを取得
+function getStartTime() {
+  const val = document.getElementById('start').value;
+  const startDate = new Date(val);
+  return startDate.getTime();
+}
+
+// 入室時間と現在時刻の差分(経過時間)をタイムスタンプで取得
+function getElapsedTime(start) {
+  const currentDate = new Date();
+  const current = currentDate.getTime();
+  return current - start;
+}
+
+// 経過時間のタイムスタンプを「○○時間○○分」にフォーマット
+function format(diff) {
+   const diffHour = diff / (1000 * 60 * 60);
+   const diffMinute = (diffHour - Math.floor(diffHour)) * 60;
+   return ('00' + Math.floor(diffHour)).slice(-2) + '時間' + ('00' + Math.floor(diffMinute)).slice(-2) + '分';
+}
+
+// 経過時間を表示
+function showElapsed() {
+   const diff = getElapsedTime(getStartTime());
+   for(let element of document.getElementsByClassName('elapsed')) {
+      element.innerText = format(diff);
+   }
+}
+
+
+/*--------------------------
+      main program
+---------------------------*/
+// 入室時間をセットした際に、経過時間が表示される
+let timerId = 0;
+document.getElementById('setTimeButton').addEventListener('click', () => {
+   showElapsed();
+   clearInterval(timerId);
+   timerId = setInterval(() => {
+     showElapsed();
+   }, 10000);
+});
+
+// 入室時間の初期値として、現在日時をセット
+window.onload = () => {
+   const d = new Date();
+   let fmt = d.getFullYear() + '-';
+   fmt += (d.getMonth() + 1).toString().padStart(2, '0') + '-';
+   fmt += d.getDate().toString().padStart(2, '0') + 'T';
+   fmt += d.getHours().toString().padStart(2, '0') + ':';
+   fmt += d.getMinutes().toString().padStart(2, '0');
+   document.getElementById('start').value = fmt;
+};
+</script>
+</body>
+</html>
